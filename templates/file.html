@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Title</title>
+    </head>
+    <style type="text/css">
+      th:tr{
+          color: blue;
+
+      }
+      tr:nth-of-type(2n){
+          border: 1px solid black;
+          background-color: rgba(150, 150, 150, 0.5);
+
+      }
+
+      td{
+          padding: 8px 8px;
+          border: 1px solid black;
+      }
+  </style>
+    <body>
+        <p><strong>Summary for file</strong> <a href=""> {{file_id}}</a></p>
+        <p>{{file_content}}</p>
+
+
+        <p>&nbsp;</p>
+        <p>Found total of {{ phrases|length }} noun phrases.</p>
+
+         <table>
+         <thead>
+             <th>Phrases</th>
+         </thead>
+
+         <tbody>
+         {%- for phrase in phrases %}
+            <tr>
+              <td><a href="">{{ phrase }}</a></td>
+            </tr>
+         {%- endfor %}
+         </tbody>
+         </table>
+    </body>
+</html>

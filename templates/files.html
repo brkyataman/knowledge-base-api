@@ -1,0 +1,37 @@
+<html>
+  <head>
+      <title>Knowledge Base</title>
+  </head>
+  <style type="text/css">
+      th:tr{
+          color: blue;
+
+      }
+      tr:nth-of-type(2n){
+          border: 1px solid black;
+          background-color: rgba(150, 150, 150, 0.5);
+
+      }
+
+      td{
+          padding: 8px 8px;
+          border: 1px solid black;
+      }
+  </style>
+  <body>
+    <table>
+     <thead>
+         <th>File ID</th>
+     </thead>
+
+     <tbody>
+     {%- for id in files %}
+        <tr>
+          <td><a href="{{url_for('files', id=id)}}">{{ id }}</a></td>
+        </tr>
+     {%- endfor %}
+     </tbody>
+     </table>
+
+  </body>
+</html>
