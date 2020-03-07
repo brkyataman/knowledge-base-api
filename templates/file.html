@@ -28,6 +28,21 @@
         <p>&nbsp;</p>
         <p>Found total of {{ phrases|length }} noun phrases.</p>
 
+
+        <ul>
+        {%- for phrase in phrases %}
+            <li>
+              <a href="{{url_for('search_phrase_in_bioportal', phrase=phrase['phrase'])}}">{{ phrase["phrase"] }}</a>
+                <ul>
+                {%- for val in phrase["ontologies"] %}
+                  <li>{{val}}</li>
+                {%- endfor %}
+                </ul>
+            </li>
+
+        {%- endfor %}
+
+        <!--
          <table>
          <thead>
              <th>Phrases</th>
@@ -36,10 +51,11 @@
          <tbody>
          {%- for phrase in phrases %}
             <tr>
-              <td><a href="">{{ phrase }}</a></td>
+              <td><a href="{{url_for('search_phrase_in_bioportal', phrase=phrase[key])}}">{{ phrase }}</a></td>
             </tr>
          {%- endfor %}
          </tbody>
          </table>
+         -->
     </body>
 </html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+    <head>
+        <meta charset="UTF-8">
+        <title>Title</title>
+    </head>
+    <style type="text/css">
+      th:tr{
+          color: blue;
+
+      }
+      tr:nth-of-type(2n){
+          border: 1px solid black;
+          background-color: rgba(150, 150, 150, 0.5);
+
+      }
+
+      td{
+          padding: 8px 8px;
+          border: 1px solid black;
+      }
+  </style>
+    <body>
+        <script type=text/javascript>
+                $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+                console.log('$SCRIPT_ROOT: ' + $SCRIPT_ROOT);
+
+                function updateNounAccuracy(phrase_id, noun_acc, existing_noun_acc){
+
+                    if(existing_noun_acc != null && existing_noun_acc != undefined){
+                        if(noun_acc == existing_noun_acc){
+                            noun_acc = null
+                        }
+                    }
+
+                    $.ajax({
+                        type: "POST",
+                        url: $SCRIPT_ROOT + '/test',
+                        contentType: "application/json",
+                        dataType: 'json',
+                        data: JSON.stringify({
+                            "phrase_id" : phrase_id,
+                            "noun_accuracy" : noun_acc
+                        }),
+                        success: function (data) {
+                            console.log("Updated phrase")
+                        },error: function(request, status, error){
+                            alert("Error: look to console..");
+                            console.log(request.responseText);
+                            console.log(error.message);
+                        }
+                    });
+                };
+        </script>
+        <button class='btn btn-default' onclick="myTestFunc();">Test</button>
+
+        <p><strong>Summary for file </strong> <a href=""> {{file_id}}</a></p>
+        <p>{{file_content}}</p>
+
+
+        <p>&nbsp;</p>
+        <p>1Found total of {{ phrases|length }} noun phrases.</p>
+
+            <table>
+                {%- for phrase in phrases %}
+                <tr>
+                    <td><a href="{{url_for('search_phrase_in_bioportal', phrase=phrase['description'])}}">{{ phrase["description"] }}</a></td>
+                    <td><input type="checkbox" onchange="updateNounAccuracy({{phrase.phrase_id}}, 1, {{Null if phrase.noun_accuracy == None else phrase.noun_accuracy}})" {{'checked="checked"' if phrase.noun_accuracy == 1 else ""}} ></td>
+                    <td><input type="checkbox" onchange="updateNounAccuracy({{phrase.phrase_id}}, 2, {{Null if phrase.noun_accuracy == None else phrase.noun_accuracy}})" {{'checked="checked"' if phrase.noun_accuracy == 2 else ""}}></td>
+                    <td><input type="checkbox" onchange="updateNounAccuracy({{phrase.phrase_id}}, 3, {{Null if phrase.noun_accuracy == None else phrase.noun_accuracy}})" {{'checked="checked"' if phrase.noun_accuracy == 3 else ""}}></td>
+                </tr>
+                {%- endfor %}
+
+            </table>
+    </body>
+</html>
