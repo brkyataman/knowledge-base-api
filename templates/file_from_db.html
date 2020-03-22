@@ -37,7 +37,7 @@
 
                     $.ajax({
                         type: "POST",
-                        url: $SCRIPT_ROOT + '/test',
+                        url: $SCRIPT_ROOT + '/save/nounAcc',
                         contentType: "application/json",
                         dataType: 'json',
                         data: JSON.stringify({
@@ -53,6 +53,33 @@
                         }
                     });
                 };
+
+                function save_note(phrase_id, note){
+                    var note = document.getElementById(phrase_id+"_note").value
+                    $.ajax({
+                        type: "POST",
+                        url: $SCRIPT_ROOT + '/save/note',
+                        contentType: "application/json",
+                        dataType: 'json',
+                        data: JSON.stringify({
+                            "phrase_id" : phrase_id,
+                            "note" : note
+                        }),
+                        success: function (data) {
+                            console.log("Updated phrase")
+                        },error: function(request, status, error){
+                            alert("Error: look to console..");
+                            console.log(request.responseText);
+                            console.log(error.message);
+                        }
+                    });
+                };
+
+                function link_builder(phrase){
+                    var query = phrase.trim();
+                    var url = "https://bioportal.bioontology.org/search?utf8=%E2%9C%93&query=" + query;
+                    window.open(url, '_blank');
+                };
         </script>
         <button class='btn btn-default' onclick="myTestFunc();">Test</button>
 
@@ -64,12 +91,22 @@
         <p>1Found total of {{ phrases|length }} noun phrases.</p>
 
             <table>
+                <tr>
+                    <th>Search it</th>
+                    <th>Phrase</th>
+                    <th>Irrelevant</th>
+                    <th>Almost relevant</th>
+                    <th>Really relevant</th>
+                    <th>Note</th>
+                </tr>
                 {%- for phrase in phrases %}
                 <tr>
+                    <td><button onclick='link_builder({{phrase.description|tojson}})'>Bioont</button></td>
                     <td><a href="{{url_for('search_phrase_in_bioportal', phrase=phrase['description'])}}">{{ phrase["description"] }}</a></td>
                     <td><input type="checkbox" onchange="updateNounAccuracy({{phrase.phrase_id}}, 1, {{Null if phrase.noun_accuracy == None else phrase.noun_accuracy}})" {{'checked="checked"' if phrase.noun_accuracy == 1 else ""}} ></td>
                     <td><input type="checkbox" onchange="updateNounAccuracy({{phrase.phrase_id}}, 2, {{Null if phrase.noun_accuracy == None else phrase.noun_accuracy}})" {{'checked="checked"' if phrase.noun_accuracy == 2 else ""}}></td>
                     <td><input type="checkbox" onchange="updateNounAccuracy({{phrase.phrase_id}}, 3, {{Null if phrase.noun_accuracy == None else phrase.noun_accuracy}})" {{'checked="checked"' if phrase.noun_accuracy == 3 else ""}}></td>
+                    <td><textarea id="{{phrase.phrase_id}}_note" name="note" rows="5">{{"" if phrase.note == None else phrase.note}}</textarea><button onclick='save_note({{phrase.phrase_id|tojson}})'>Save</button></td>
                 </tr>
                 {%- endfor %}
 

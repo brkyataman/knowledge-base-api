@@ -37,12 +37,21 @@ def greetings():
     return render_template('greetings.html')
 
 
-@app.route('/test', methods=["POST"])
-def testfunc():
+@app.route('/save/nounAcc', methods=["POST"])
+def save_noun_accuracy():
     data = request.json
     with GetDbConnection() as con:
         query = "UPDATE phrases SET noun_accuracy = %s where phrase_id = %s "
         args = (data["noun_accuracy"], data["phrase_id"])
+        con.execute(query, args)
+    return jsonify("done")
+
+@app.route('/save/note', methods=["POST"])
+def save_note():
+    data = request.json
+    with GetDbConnection() as con:
+        query = "UPDATE phrases SET note = %s where phrase_id = %s "
+        args = (data["note"], data["phrase_id"])
         con.execute(query, args)
     return jsonify("done")
 
