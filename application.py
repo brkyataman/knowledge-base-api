@@ -60,12 +60,11 @@ def save_note():
 @app.route('/files/<id>')
 def files(id=None):
     if id is None:
-        files = get_files()
+        files = get_article_ids()
         return render_template('files.html', files=files)
     else:
         noun_phrases = get_noun_phrases_from_db(int(id))
-        #noun_phrases = get_noun_phrases_of_file(id + ".txt")
-        return render_template("file_from_db.html", file_id=id, file_content=get_content(os.path.join(source_path, id + ".txt")), phrases=noun_phrases)
+        return render_template("file_from_db.html", file_id=id, file_content=get_article_content(id), phrases=noun_phrases)
 
 
 @app.route('/filePhrases/<id>')
@@ -148,11 +147,28 @@ def get_lines(file_path):
         fp.close()
     return text
 
+def get_article_content(id):
+    article = get_article_data(id)
+    if len(article) == 0:
+        raise Exception(f'Article {id} does not exist in database!')
+    return article[0]['body']
 
-def get_files():
-    files = os.listdir(processed_files_path)
-    return [os.path.splitext(file)[0] for file in files]
 
+def get_article_ids():
+    articles = get_article_data(None)
+    return [article['article_id'] for article in articles]
+
+
+def get_article_data(id):
+    with GetDbConnection() as con:
+        query = "select article_id, body from articles"
+        params = None
+        if id is not None:
+            query += " where article_id = %s"
+            params = (id)
+        con.execute(query, params)
+        result = con.fetchall()
+    return result
 
 def search_bioportal(term):
     params = {'q': term, "apikey": BIOPORTAL_API_KEY, "require_exact_match": "false"}
